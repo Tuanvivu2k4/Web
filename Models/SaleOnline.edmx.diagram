@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="5367b50fc2e04fa097fa5c3a3fa03945" Name="Diagram1">
+        <EntityTypeShape EntityType="SaleOnlineModel.Admin" Width="1.5" PointX="0.75" PointY="8" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.Cart" Width="1.5" PointX="7.5" PointY="13" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.CartItem" Width="1.5" PointX="9.75" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.Category" Width="1.5" PointX="0.75" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.Order" Width="1.5" PointX="7.5" PointY="8.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.OrderItem" Width="1.5" PointX="9.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.Product" Width="1.5" PointX="3" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.sysdiagram" Width="1.5" PointX="0.75" PointY="11" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.UserAccount" Width="1.5" PointX="5.25" PointY="8.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.UserAddress" Width="1.5" PointX="7.5" PointY="15.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.Variation" Width="1.5" PointX="5.25" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.VariationOption" Width="1.5" PointX="7.5" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SaleOnlineModel.Voucher" Width="1.5" PointX="9.75" PointY="7" IsExpanded="true" />
+        <AssociationConnector Association="SaleOnlineModel.FK__Cart__UserId__2EDAF651" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__CartItem__CartId__339FAB6E" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__CartItem__Variat__32AB8735" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__Product__Categor__71D1E811" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__Order__UserId__395884C4" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__OrderItem__Order__3E1D39E1" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__OrderItem__Varia__3F115E1A" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__Variation__Produ__74AE54BC" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__UserAddre__UserI__2BFE89A6" ManuallyRouted="false" />
+        <AssociationConnector Association="SaleOnlineModel.FK__Variation__Varia__7C4F7684" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

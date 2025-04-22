@@ -1,0 +1,130 @@
+﻿@model PagedList.IPagedList<SaleOnline.Models.UserAccount>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Quản lý khách hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Bộ lọc tìm kiếm -->
+<div class="row mb-3">
+    <div class="col-md-8 mx-auto d-flex justify-content-center gap-2">
+        <input type="text" class="form-control" id="searchId" placeholder="Tìm theo ID" value="@ViewBag.CurrentSearchId" style="max-width: 200px;" />
+        <select class="form-control" id="searchStatus" style="max-width: 200px;">
+            <option value="">-- Trạng thái --</option>
+            <option value="Active" @(ViewBag.CurrentStatus == "Active" ? "selected" : "")>Active</option>
+            <option value="Locked" @(ViewBag.CurrentStatus == "Locked" ? "selected" : "")>Locked</option>
+            <option value="Deleted" @(ViewBag.CurrentStatus == "Deleted" ? "selected" : "")>Deleted</option>
+        </select>
+        <button class="btn btn-primary" id="btnSearch"><i class="fa fa-search"></i> Tìm</button>
+    </div>
+</div>
+
+<!-- Bảng khách hàng -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="checkAll" /></th>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Họ tên</th>
+            <th>Ngày sinh</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody id="customerTableContainer">
+        @Html.Partial("_CustomerTablePartial", Model)
+    </tbody>
+</table>
+
+<!-- Phân trang -->
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+    {
+        page,
+        searchId = ViewBag.CurrentSearchId,
+        status = ViewBag.CurrentStatus
+    }), new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5,
+        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+        UlElementClasses = new[] { "pagination", "justify-content-center" }
+    })
+</div>
+
+<div id="editStatusModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sửa trạng thái tài khoản</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body" id="editStatusContent"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#btnSearch').click(function () {
+                const id = $('#searchId').val();
+                const status = $('#searchStatus').val();
+                const query = `?searchId=${id}&status=${status}`;
+                window.location.href = '@Url.Action("Index", "Customers", new { area = "Admin" })' + query;
+            });
+
+            $('#checkAll').click(function () {
+                $('.checkItem').prop('checked', $(this).prop('checked'));
+            });
+            // Khi tích checkbox dòng
+            $(document).on('change', '.checkItem', function () {
+                const allChecked = $('.checkItem').length === $('.checkItem:checked').length;
+                $('#checkAll').prop('checked', allChecked);
+            });
+
+            // Khi tích/bỏ checkbox "Chọn tất cả"
+            $(document).on('change', '#checkAll', function () {
+                $('.checkItem').prop('checked', $(this).is(':checked'));
+            });
+            $(document).on('click', '.btn-edit-customer-status', function () {
+                var id = $(this).data('id');
+                $.get('/Admin/Customers/EditStatusPartial/' + id, function (html) {
+                    $('#editStatusContent').html(html);
+                    $('#editStatusModal').modal('show');
+                });
+            });
+
+            $(document).on('submit', '#editStatusForm', function (e) {
+                e.preventDefault();
+
+                const form = $(this);
+                const formData = form.serialize();
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function () {
+                        $('#editStatusModal').modal('hide');
+                        $.get('@Url.Action("GetCustomerTable", "Customers")', function (html) {
+                            $('#customerTableContainer').html(html);
+                        });
+                        alert("Cập nhật thành công.");
+                    },
+                    error: function (xhr) {
+                        $('#editStatusContent').html(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+}

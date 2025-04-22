@@ -1,0 +1,107 @@
+﻿@model SaleOnline.Models.HomePageViewModel
+
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Html.Partial("_HeaderLayout")
+
+<!-- Banner -->
+<div class="d-flex justify-content-center">
+    <div id="homeCarousel" class="carousel slide mt-2 mb-4 w-100" data-bs-ride="carousel" style="max-width: 1140px;">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="~/Content/banner1.jpg" class="d-block w-100" style="max-height: 240px; object-fit: cover;" />
+            </div>
+            <div class="carousel-item">
+                <img src="~/Content/banner2.jpg" class="d-block w-100" style="max-height: 240px; object-fit: cover;" />
+            </div>
+            <div class="carousel-item">
+                <img src="~/Content/banner3.jpg" class="d-block w-100" style="max-height: 240px; object-fit: cover;" />
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+</div>
+
+<!-- Danh mục sản phẩm -->
+<div class="container my-4">
+    <h4 class="fw-bold mb-3">DANH MỤC</h4>
+
+    <div class="position-relative">
+        <!-- Nút trái -->
+        <button class="btn btn-light position-absolute start-0 top-50 translate-middle-y shadow" id="scrollLeft" style="z-index: 2;">
+            <i class="fa fa-chevron-left"></i>
+        </button>
+
+        <!-- Danh sách danh mục cuộn ngang -->
+        <div id="categoryContainer" class="d-flex overflow-auto px-5 gap-3" style="scroll-behavior: smooth;">
+            @foreach (var item in Model.Categories)
+            {
+                <div class="text-center flex-shrink-0" style="width: 120px;">
+                    <div class="card border-0 shadow-sm">
+                        <img src="@Url.Content(item.Image)" class="card-img-top p-3" style="height: 80px; object-fit: contain;" />
+                        <div class="card-body p-2">
+                            <p class="card-text small fw-semibold">@item.Name</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Nút phải -->
+        <button class="btn btn-light position-absolute end-0 top-50 translate-middle-y shadow" id="scrollRight" style="z-index: 2;">
+            <i class="fa fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<div class="container my-5">
+    <h4 class="fw-bold mb-3">GỢI Ý HÔM NAY</h4>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+        @foreach (var item in Model.Products)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="@Url.Content(item.Image)" class="card-img-top" style="height: 160px; object-fit: cover;" />
+                    <div class="card-body">
+                        <div class="mb-2" style="height: 40px; overflow: hidden;">
+                            <span class="fw-semibold">@item.Name</span>
+                        </div>
+                        <p class="text-danger fw-bold mb-1">
+                            @if (item.MinPrice == item.MaxPrice)
+                            {
+                                @($"{item.MinPrice:N0}₫")
+                            }
+                            else
+                            {
+                                @($"{item.MinPrice:N0}₫ - {item.MaxPrice:N0}₫")
+                            }
+                        </p>
+                        <small class="text-muted">Đã bán @item.QuantitySold.ToString("N0")</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const container = document.getElementById("categoryContainer");
+        const scrollAmount = 300;
+
+        document.getElementById("scrollLeft").onclick = () => {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        };
+
+        document.getElementById("scrollRight").onclick = () => {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        };
+    </script>
+}

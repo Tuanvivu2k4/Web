@@ -1,0 +1,60 @@
+﻿@model SaleOnline.Models.EditCategoryViewModel
+
+@using (Html.BeginForm("Edit", "Categories", FormMethod.Post, new { enctype = "multipart/form-data", @id = "editCategoryForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+    @Html.ValidationSummary(true, "", new { @class = "text-danger validation-summary-errors" })
+
+    <div class="modal-header">
+        <h5 class="modal-title">Sửa danh mục</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group">
+            @Html.LabelFor(m => m.Name)
+            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Name, null, new { @class = "text-danger" })
+        </div>
+
+        <div class="mb-3">
+            <label>Ảnh hiện tại:</label><br />
+            @if (!string.IsNullOrEmpty(Model.Image))
+            {
+                <img src="@Url.Content(Model.Image)" alt="Image" class="img-thumbnail" style="max-height: 100px;" />
+            }
+            else
+            {
+                <span>Không có ảnh</span>
+            }
+        </div>
+
+        <div class="mb-3">
+            @Html.Label("Chọn ảnh mới (nếu muốn thay)")
+            <input type="file" name="ImageFile" class="form-control" />
+            @Html.ValidationMessageFor(m => m.ImageFile, null, new { @class = "text-danger" })
+        </div>
+
+        <div class="mb-3">
+            @Html.Label("Available")
+            @Html.DropDownListFor(m => m.Available, new List<SelectListItem> {
+                new SelectListItem { Text = "Active", Value = "Active" },
+                new SelectListItem { Text = "Inactive", Value = "Inactive" }
+            }, "-- Chọn trạng thái --", new { @class = "form-select" })
+            @Html.ValidationMessageFor(m => m.Available, null, new { @class = "text-danger" })
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" id="btnSubmitEdit">Lưu</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        </div>
+    </div>
+}
+
+<script>
+    $(function () {
+        $('#editCategoryForm').on('submit', function () {
+            $('#file-error').remove(); // Xoá lỗi nếu có (dùng cho thêm ảnh nếu cần)
+        });
+    });
+</script>

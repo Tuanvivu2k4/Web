@@ -1,0 +1,6 @@
+﻿@model IEnumerable<SaleOnline.Models.Voucher>
+
+@foreach (var item in Model)
+{
+    @Html.Partial("_VoucherRowPartial", item)
+}

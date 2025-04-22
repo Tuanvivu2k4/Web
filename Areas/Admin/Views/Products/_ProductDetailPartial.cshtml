@@ -1,0 +1,46 @@
+﻿@model SaleOnline.Models.Product
+
+<div>
+    <p><strong>Tên sản phẩm:</strong> @Model.Name</p>
+    <p><strong>Ngày sản xuất:</strong> @Model.ProductionDate.ToString("dd/MM/yyyy")</p>
+    <p><strong>Mô tả:</strong> @Model.Description</p>
+    <p><strong>Danh mục:</strong> @((Model.Category as SaleOnline.Models.Category)?.Name)</p>
+    <p><strong>Trạng thái:</strong> @Model.Available</p>
+    <hr />
+
+    @foreach (var variation in Model.Variations)
+    {
+        <h6>Biến thể: @variation.Name (@variation.Available)</h6>
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th>Giá trị</th>
+                    <th>Ảnh</th>
+                    <th>Tồn kho</th>
+                    <th>Giá gốc</th>
+                    <th>Giá bán</th>
+                    <th>Giảm (%)</th>
+                    <th>Giá sau giảm</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var opt in variation.VariationOptions)
+                {
+                    <tr>
+                        <td>@opt.Value</td>
+                        <td>
+                            <img src="@Url.Content(opt.Image)" width="50" height="50" style="object-fit:cover;" />
+                        </td>
+                        <td>@opt.Stock</td>
+                        <td>@opt.OriginalPrice.ToString("N0")</td>
+                        <td>@opt.SellingPrice.ToString("N0")</td>
+                        <td>@(opt.Discount * 100)%</td>
+                        <td>@opt.FinalPrice.ToString("N0")</td>
+                        <td>@opt.Available</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

@@ -1,0 +1,57 @@
+﻿@{
+    var isLoggedIn = Session["UserId"] != null;
+    var userName = Session["UserName"] as string;
+}
+<header class="bg-danger text-white px-4 py-2">
+    <div class="container-fluid">
+
+        <!-- Dòng 1: Logo + Account -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+
+            <!-- Logo -->
+            <a href="@Url.Action("Index", "Home")" class="d-flex align-items-center text-white text-decoration-none">
+                <img src="~/Content/Logo.jpg" alt="Logo" style="height: 36px; margin-right: 10px;" />
+                <span class="fs-4 fw-bold">OnlineShop</span>
+            </a>
+
+            <!-- Account + Cart -->
+            <div class="d-flex align-items-center gap-3">
+                <a href="@Url.Action("Index", "Cart")" class="text-white position-relative">
+                    <i class="fa fa-shopping-cart fa-lg"></i>
+                </a>
+
+                @if (Session["UserId"] == null)
+                {
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-outline-light btn-sm">Đăng nhập</a>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-light btn-sm text-danger fw-bold">Đăng ký</a>
+                }
+                else
+                {
+                    <div class="dropdown">
+                        <a class="d-flex align-items-center dropdown-toggle text-white text-decoration-none" href="#" data-bs-toggle="dropdown">
+                            <img src="~/Content/avatars/user.png" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;" />
+                            <span>@Session["UserName"]</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="@Url.Action("Profile", "Account")">Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Orders", "Account")">Đơn mua</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" href="@Url.Action("Logout", "Account")">Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Dòng 2: Search bar -->
+        <div class="d-flex justify-content-center">
+            <form class="input-group" action="@Url.Action("Search", "Product")" method="get" style="max-width: 600px; width: 100%;">
+                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm sản phẩm..." />
+                <button class="btn btn-light" type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</header>

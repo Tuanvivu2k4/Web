@@ -1,0 +1,53 @@
+﻿@model SaleOnline.Models.UserAccount
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Chi tiết khách hàng</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p><strong>ID:</strong> @Model.Id</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Họ tên:</strong> @Model.Name</p>
+        <p><strong>Ngày sinh:</strong> @(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Không có")</p>
+        <p><strong>Trạng thái:</strong> @Model.AccountStatus</p>
+    </div>
+</div>
+
+<h4>Địa chỉ & số điện thoại</h4>
+@if (Model.UserAddresses != null)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Số điện thoại</th>
+                <th>Địa chỉ</th>
+                <th>Mặc định</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var addr in Model.UserAddresses)
+            {
+                <tr>
+                    <td>@addr.PhoneNumber</td>
+                    <td>@addr.Address</td>
+                    <td>
+                        @if (addr.IsDefault == true)
+                        {
+                            <span class="badge bg-success">Mặc định</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Không có địa chỉ nào.</p>
+}
+
+<a href="@Url.Action("Index", "Customers", new { area = "Admin" })" class="btn btn-secondary">← Quay lại</a>

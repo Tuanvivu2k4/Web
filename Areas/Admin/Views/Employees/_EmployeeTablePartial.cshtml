@@ -1,0 +1,7 @@
+﻿@model IEnumerable<SaleOnline.Models.Admin>
+
+@foreach (var item in Model)
+{
+    @Html.Partial("_EmployeeRowPartial", item)
+}
+

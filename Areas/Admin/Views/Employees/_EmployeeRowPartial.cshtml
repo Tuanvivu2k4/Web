@@ -1,0 +1,31 @@
+﻿@model SaleOnline.Models.Admin
+
+<tr>
+    <td>
+        <input type="checkbox" class="checkItem" data-id="@Model.Id" />
+    </td>
+    <td>@Model.Id</td>
+    <td colspan="2">
+        <div class="d-flex align-items-center">
+            <img src="@Url.Content(Model.Role == "Admin" ? "~/Content/avatars/admin.png" : "~/Content/avatars/employee.jpg")"
+                 style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%; margin-right: 10px;" />
+            <span>@Model.Name</span>
+        </div>
+    </td>
+    <td>@Model.Role</td>
+    <td>
+        <a href="javascript:void(0);" class="text-primary me-2 btn-edit-employee" data-id="@Model.Id" title="Sửa">
+            <i class="fa fa-edit"></i>
+        </a>
+        <a href="javascript:void(0);"
+           class="text-warning me-2 btn-reset-password"
+           data-id="@Model.Id"
+           title="Cấp lại mật khẩu">
+            <i class="fa fa-key"></i>
+        </a>
+        <button class="btn btn-danger btn-sm delete-employee" data-id="@Model.Id">
+            <i class="fa fa-trash"></i>
+        </button>
+    </td>
+</tr>
+

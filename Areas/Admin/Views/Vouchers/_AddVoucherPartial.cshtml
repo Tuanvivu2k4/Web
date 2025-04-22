@@ -1,0 +1,61 @@
+﻿@model SaleOnline.Models.CreateVoucherViewModel
+
+@using (Html.BeginForm("Create", "Vouchers", FormMethod.Post, new { enctype = "multipart/form-data", id = "createVoucherForm" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="modal fade" id="addVoucherModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm Voucher</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="addVoucherModalBody">
+                    <div class="mb-2">
+                        @Html.LabelFor(m => m.Code)
+                        @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-2">
+                        @Html.LabelFor(m => m.Discount)
+                        @Html.TextBoxFor(m => m.Discount, new { @class = "form-control", type = "number", step = "0.01" })
+                        @Html.ValidationMessageFor(m => m.Discount, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-2">
+                        @Html.LabelFor(m => m.Quantity)
+                        @Html.TextBoxFor(m => m.Quantity, new { @class = "form-control", type = "number", min = "1" })
+                        @Html.ValidationMessageFor(m => m.Quantity, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-2">
+                        @Html.LabelFor(m => m.StartDate)
+                        @Html.TextBox("StartDate", Model.StartDate != DateTime.MinValue ?
+                            Model.StartDate.ToString("yyyy-MM-ddTHH:mm") : "",
+                            new { @class = "form-control", type = "datetime-local" })
+                        @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-2">
+                        @Html.LabelFor(m => m.EndDate)
+                        @Html.TextBox("EndDate", Model.EndDate != DateTime.MinValue ?
+                            Model.EndDate.ToString("yyyy-MM-ddTHH:mm") : "",
+                            new { @class = "form-control", type = "datetime-local" })
+                        @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-2">
+                        @Html.LabelFor(m => m.Available)
+                        @Html.DropDownListFor(m => m.Available, new SelectList(new[] { "Active", "Expired" }), "-- Chọn trạng thái --", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Available, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

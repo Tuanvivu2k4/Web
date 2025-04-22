@@ -1,0 +1,108 @@
+﻿@model SaleOnline.Models.EditProductViewModel
+
+@using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { enctype = "multipart/form-data", id = "editProductForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="mb-2">
+        @Html.LabelFor(m => m.Name)
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-2">
+        @Html.LabelFor(m => m.ProductionDate)
+        @Html.TextBoxFor(m => m.ProductionDate, new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(m => m.ProductionDate, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-2">
+        @Html.Label("Ảnh sản phẩm")
+        <input type="file" name="ImageFile" class="form-control" />
+        @if (!string.IsNullOrEmpty(Model.Image))
+        {
+            <img src="@Url.Content(Model.Image)" class="mt-2" width="80" height="80" style="object-fit:cover;" />
+        }
+    </div>
+
+    <div class="mb-2">
+        @Html.LabelFor(m => m.Description)
+        @Html.TextAreaFor(m => m.Description, 3, 60, new { @class = "form-control" })
+    </div>
+
+    <div class="mb-2">
+        @Html.LabelFor(m => m.CategoryId)
+        @Html.DropDownListFor(m => m.CategoryId, new SelectList(ViewBag.Categories, "Id", "Name"), "-- Chọn danh mục --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-2">
+        @Html.LabelFor(m => m.Available)
+        @Html.DropDownListFor(m => m.Available, new SelectList(new[] { "Active", "Inactive" }), "-- Trạng thái --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Available, "", new { @class = "text-danger" })
+    </div>
+
+    <hr />
+    <h5>Biến thể</h5>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            @Html.Label("Tên biến thể")
+            @Html.TextBoxFor(m => m.VariationName, new { @class = "form-control" })
+        </div>
+        <div class="col-md-6 mb-2">
+            @Html.Label("Trạng thái biến thể")
+            @Html.DropDownListFor(m => m.VariationAvailable, new SelectList(new[] { "Active", "Inactive" }), "-- Trạng thái --", new { @class = "form-control" })
+        </div>
+    </div>
+
+    <hr />
+    <h5>Tùy chọn</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Giá trị</th>
+                <th>Ảnh</th>
+                <th>Tồn kho</th>
+                <th>Giá gốc</th>
+                <th>Giá bán</th>
+                <th>Giảm (%)</th>
+                <th>Giá sau giảm</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Options.Count; i++)
+            {
+                <tr>
+                    @Html.HiddenFor(m => m.Options[i].Id)
+                    <td>@Html.TextBoxFor(m => m.Options[i].Value, new { @class = "form-control" })</td>
+                    <td>
+                        <input type="file" name="Options[@i].ImageFile" class="form-control" />
+                        @if (!string.IsNullOrEmpty(Model.Options[i].Image))
+                        {
+                            <img src="@Url.Content(Model.Options[i].Image)" class="mt-1" width="50" height="50" style="object-fit:cover;" />
+                        }
+                    </td>
+                    <td>@Html.TextBoxFor(m => m.Options[i].Stock, new { @class = "form-control", type = "number" })</td>
+                    <td>@Html.TextBoxFor(m => m.Options[i].OriginalPrice, new { @class = "form-control", type = "number", step = "0.01" })</td>
+                    <td><input type="number" name="Options[@i].SellingPrice" class="form-control price-input" value="@Model.Options[i].SellingPrice" step="0.01" /></td>
+                    <td><input type="number" name="Options[@i].Discount" class="form-control discount-input" value="@Model.Options[i].Discount" step="0.01" min="0" max="1" /></td>
+                    <td><input type="number" name="Options[@i].FinalPrice" class="form-control final-input" value="@Model.Options[i].FinalPrice" step="0.01" /></td>
+                    <td>
+                        <select name="Options[@i].Available" class="form-control">
+                            <option value="Active" @(Model.Options[i].Available == "Active" ? "selected" : "")>Active</option>
+                            <option value="Inactive" @(Model.Options[i].Available == "Inactive" ? "selected" : "")>Inactive</option>
+                        </select>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+}
+

@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - Admin Dashboard</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f6fa;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #1f2937;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+            .sidebar.hidden {
+                transform: translateX(-100%);
+            }
+
+            .sidebar h2 {
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .sidebar a {
+                color: white;
+                text-decoration: none;
+                margin: 0.5rem 0;
+                display: flex;
+                align-items: center;
+                font-size: 1rem;
+                padding-left: 0.5rem;
+            }
+
+                .sidebar a i {
+                    width: 20px; /* 👈 Đặt chiều rộng cố định cho icon */
+                    text-align: center;
+                    margin-right: 10px;
+                }
+
+        .main {
+            margin-left: 260px;
+            padding: 5rem 2rem 2rem;
+            transition: margin-left 0.3s ease;
+        }
+
+            .main.full {
+                margin-left: 0;
+            }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 60px;
+            width: calc(100% - 250px);
+            background-color: #f5f6fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: width 0.3s ease;
+        }
+
+            .topbar.full {
+                width: 100%;
+            }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            object-fit: cover;
+        }
+
+        .dropdown-menu {
+            right: 0;
+            left: auto;
+        }
+
+        .page-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .hamburger {
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+        .pagination > li > a,
+        .pagination > li > span {
+            color: #333;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin: 0 2px;
+            padding: 6px 12px;
+        }
+
+        .pagination > .active > a,
+        .pagination > .active > span,
+        .pagination > .active > a:hover,
+        .pagination > .active > span:hover {
+            background-color: #10b981; /* màu xanh */
+            border-color: #10b981;
+            color: #fff;
+        }
+
+        .pagination > li > a:hover {
+            background-color: #d1fae5;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <div class="sidebar" id="sidebar">
+        <h2><i class="fa-solid fa-chart-line"></i> DashAdmin</h2>
+        <a href="@Url.Action("Index", "Dashboard", new { area = "Admin" })"><i class="fa-solid fa-gauge"></i> Thống kê</a>
+        <a href="#" data-bs-toggle="collapse" data-bs-target="#warehouseMenu"><i class="fa-solid fa-box"></i> Quản lý kho</a>
+        <div id="warehouseMenu" class="collapse">
+            <a class="ps-4" href="@Url.Action("Index", "Categories", new { area = "Admin" })">Danh mục sản phẩm</a>
+            <a class="ps-4" href="@Url.Action("Index", "Products", new { area = "Admin" })">Sản phẩm</a>
+        </div>
+        <a href="@Url.Action("Index", "Orders", new { area = "Admin" })"><i class="fa-solid fa-receipt"></i> Quản lý đơn hàng</a>
+        <a href="@Url.Action("Index", "Employees", new { area = "Admin" })"><i class="fa-solid fa-users"></i> Quản lý nhân viên</a>
+        <a href="@Url.Action("Index", "Customers", new { area = "Admin" })"><i class="fa-solid fa-user"></i> Quản lý khách hàng</a>
+        <a href="@Url.Action("Index", "Vouchers", new { area = "Admin" })"><i class="fa-solid fa-ticket-alt"></i> Quản lý voucher</a>
+        <a href="@Url.Action("Logout", "Account", new { area = "Admin" })" class="mt-auto text-danger"><i class="fa-solid fa-sign-out-alt"></i> Đăng xuất</a>
+    </div>
+
+    <div class="main" id="main">
+        <div class="topbar" id="topbar">
+            <h1 class="page-title">
+                <i class="fa-solid fa-bars hamburger" id="toggleSidebar"></i>
+                @ViewBag.Title
+            </h1>
+            <div class="dropdown">
+                <img src="@Url.Content("~/Content/avatars/admin.png")" class="avatar dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" />
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="@Url.Action("ChangePassword", "Account", new { area = "Admin" })">Đổi mật khẩu</a></li>
+                    <li><a class="dropdown-item text-danger" href="@Url.Action("Logout", "Account", new { area = "Admin" })">Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+
+        @RenderBody()
+        @RenderSection("Scripts", required: false)
+    </div>
+
+    <script src="~/Scripts/jquery-3.6.0.min.js"></script>
+    <script src="~/Scripts/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById("toggleSidebar").addEventListener("click", function () {
+            document.getElementById("sidebar").classList.toggle("hidden");
+            document.getElementById("main").classList.toggle("full");
+            document.getElementById("topbar").classList.toggle("full");
+        });
+    </script>
+</body>
+</html>

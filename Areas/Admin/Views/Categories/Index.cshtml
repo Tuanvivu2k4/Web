@@ -1,0 +1,226 @@
+﻿@model PagedList.IPagedList<SaleOnline.Models.Category>
+@using PagedList.Mvc;
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@{
+    ViewBag.Title = "Danh mục sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row mb-3">
+    <div class="d-flex justify-content-center align-items-center mb-3">
+        <form method="get" action="@Url.Action("Index", "Categories", new { area = "Admin" })" class="d-flex" style="max-width: 400px; width: 100%;">
+            <input type="text" id="searchKeyword" name="search" value="@Request.QueryString["search"]" class="form-control me-2" placeholder="Search by name..." />
+            <button type="submit" class="btn btn-outline-primary" id="btnSearch">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fa fa-download"></i> Export
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="@Url.Action("Export", new { format = "xlsx" })">Export to Excel (.xlsx)</a></li>
+            <li><a class="dropdown-item" href="@Url.Action("Export", new { format = "csv" })">Export to CSV (.csv)</a></li>
+            <li><a class="dropdown-item" href="@Url.Action("Export", new { format = "txt" })">Export to Text (.txt)</a></li>
+        </ul>
+        <form action="@Url.Action("Import", "Categories", new { area = "Admin" })" method="post" enctype="multipart/form-data" class="d-inline-block me-2">
+            <div class="input-group">
+                <input type="file" name="importFile" class="form-control" accept=".xlsx,.csv,.txt" required />
+                <button type="submit" class="btn btn-success">
+                    <i class="fa fa-upload"></i> Import
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div>
+        <button class="btn btn-danger me-2" id="btnDeleteSelected">
+            <i class="fa fa-trash"></i> Xoá
+        </button>
+
+        <!-- Nút Add Category -->
+        <button id="btnShowAddModal" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+            <i class="fa fa-plus"></i> Thêm
+        </button>
+    </div>
+</div>
+
+<!-- Bảng danh sách -->
+<table class="table table-bordered table-hover align-middle">
+    <thead class="table-light">
+        <tr>
+            <th><input type="checkbox" id="checkAll" /></th>
+            <th>ID</th>
+            <th>ẢNH</th>
+            <th>NAME</th>
+            <th>AVAILABLE</th>
+            <th>ACTIONS</th>
+        </tr>
+    </thead>
+    <tbody id="category-table-container">
+        @Html.Partial("_CategoryTablePartial", Model.ToList())
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-center mt-3">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, search = Request.QueryString["search"] }),
+    new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5,
+        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+        UlElementClasses = new[] { "pagination", "justify-content-center" }
+    })
+</div>
+
+<!-- Modal: Add Category -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryLabel">Thêm danh mục</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("_AddCategoryPartial", new SaleOnline.Models.CreateCategoryViewModel())
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @* Nội dung sẽ được load động qua Ajax *@
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            $(document).on("submit", "#createCategoryForm", function (e) {
+                e.preventDefault();
+
+                const form = this;
+                const formData = new FormData(form);
+
+                $.ajax({
+                    url: form.action,
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function () {
+                        $("#categoryTableBody").load("/Admin/Categories/GetCategoryTable");
+                        $("#addCategoryModal").modal("hide");
+                        form.reset();
+                    },
+                    error: function (xhr) {
+                        $(".modal-body").html(xhr.responseText);
+                    }
+                });
+            });
+
+            $(document).on('click', '.delete-category', function () {
+                var id = $(this).data('id');
+                if (!confirm("Bạn có chắc muốn xoá các danh mục đã chọn?")) return;
+                $.ajax({
+                    url: '@Url.Action("Delete", "Categories", new { area = "Admin" })',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.success) {
+                            $.get('@Url.Action("GetCategoryTable", "Categories", new { area = "Admin" })', function (html) {
+                                $('#category-table-container').html(html);
+                                $('#checkAll').prop('checked', false);
+                                alert("Category deleted successfully!");
+                            });
+                        }
+                    },
+                    error: function () {
+                        alert('Xoá thất bại. Có thể danh mục đang được sử dụng.');
+                    }
+                });
+            });
+
+            // Khi tích checkbox dòng
+            $(document).on('change', '.checkItem', function () {
+                const allChecked = $('.checkItem').length === $('.checkItem:checked').length;
+                $('#checkAll').prop('checked', allChecked);
+            });
+
+            // Khi tích/bỏ checkbox "Chọn tất cả"
+            $(document).on('change', '#checkAll', function () {
+                $('.checkItem').prop('checked', $(this).is(':checked'));
+            });
+            $(document).on('click', '#btnDeleteSelected', function () {
+                let ids = [];
+
+                $('.checkItem:checked').each(function () {
+                    let id = $(this).data('id');
+                    if (id) {
+                        ids.push(id);
+                    }
+                });
+
+                if (ids.length === 0) {
+                    alert("Bạn chưa chọn danh mục nào để xoá.");
+                    return;
+                }
+
+                if (!confirm("Bạn có chắc muốn xoá các danh mục đã chọn?")) return;
+
+                $.ajax({
+                    url: '@Url.Action("DeleteSelected", "Categories", new { area = "Admin" })',
+                    type: 'POST',
+                    traditional: true, // rất quan trọng khi gửi List<long>
+                    data: { ids: ids },
+                    success: function (res) {
+                        if (res.success) {
+                            $.get('@Url.Action("GetCategoryTable", "Categories", new { area = "Admin" })', function (html) {
+                                $('#category-table-container').html(html);
+                                $('#checkAll').prop('checked', false); // reset ô chọn tất cả
+                                alert('Category deleted successfully!');
+                            });
+                        }
+                    },
+                    error: function () {
+                        alert('Xoá thất bại. Có thể có danh mục đang được sử dụng.');
+                    }
+                });
+            });
+            $(document).on("click", ".btn-edit-category", function () {
+                var id = $(this).data("id");
+
+                $.ajax({
+                    url: '/Admin/Categories/EditPartial/' + id,
+                    type: 'GET',
+                    success: function (html) {
+                        $('#editCategoryModal .modal-content').html(html);
+                        $('#editCategoryModal').modal('show');
+                        form.reset();
+                    },
+                    error: function () {
+                        alert('Không thể tải form chỉnh sửa.');
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,135 @@
+﻿@model SaleOnline.Models.CreateProductViewModel
+
+@using (Html.BeginForm("Create", "Products", FormMethod.Post, new { enctype = "multipart/form-data", id = "createProductForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="modal fade" id="addProductModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body" id="addProductModalBody">
+                    <!-- === PRODUCT === -->
+                    <h5>Thông tin sản phẩm</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            @Html.LabelFor(m => m.Name)
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            @Html.LabelFor(m => m.ProductionDate)
+                            @Html.TextBoxFor(m => m.ProductionDate, new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.ProductionDate, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            @Html.Label("Ảnh sản phẩm")
+                            <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+                            @Html.ValidationMessage("ImageFile", "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            @Html.LabelFor(m => m.CategoryId)
+                            @Html.DropDownListFor(m => m.CategoryId, new SelectList(ViewBag.Categories, "Id", "Name"), "-- Chọn danh mục --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="col-md-12 mb-2">
+                            @Html.LabelFor(m => m.Description)
+                            @Html.TextAreaFor(m => m.Description, 3, 80, new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            @Html.LabelFor(m => m.Available)
+                            @Html.DropDownListFor(m => m.Available, new SelectList(new[] { "Active", "Inactive" }), "-- Trạng thái --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Available, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- === VARIATION === -->
+                    <hr />
+                    <h5>Thông tin phân loại</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            @Html.LabelFor(m => m.VariationName)
+                            @Html.TextBoxFor(m => m.VariationName, new { @class = "form-control" })
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            @Html.LabelFor(m => m.VariationAvailable)
+                            @Html.DropDownListFor(m => m.VariationAvailable, new SelectList(new[] { "Active", "Inactive" }), "-- Trạng thái --", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.VariationAvailable, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <!-- === VARIATION OPTIONS === -->
+                    <hr />
+                    <h5>Danh sách tùy chọn</h5>
+                    <table class="table table-bordered" id="optionTable">
+                        <thead>
+                            <tr>
+                                <th>Giá trị</th>
+                                <th>Ảnh</th>
+                                <th>Tồn kho</th>
+                                <th>Giá gốc</th>
+                                <th>Giá bán</th>
+                                <th>Giảm</th>
+                                <th>Giá sau giảm</th>
+                                <th>Trạng thái</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="optionBody">
+                            <!-- các dòng sẽ được thêm bằng JS -->
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-secondary" id="btnAddOption"><i class="fa fa-plus"></i> Thêm tùy chọn</button>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    let optionIndex = 0;
+
+    function buildOptionRow(index) {
+        return `
+        <tr>
+            <td><input type="text" name="Options[${index}].Value" class="form-control" /></td>
+            <td><input type="file" name="Options[${index}].ImageFile" accept="image/*" class="form-control" /></td>
+            <td><input type="number" name="Options[${index}].Stock" class="form-control" value="0" /></td>
+            <td><input type="number" name="Options[${index}].OriginalPrice" step="0.01" class="form-control" /></td>
+            <td><input type="number" name="Options[${index}].SellingPrice" step="0.01" class="form-control" /></td>
+            <td><input type="number" name="Options[${index}].Discount" step="0.01" min="0" max="1" class="form-control" /></td>
+            <td><input type="number" name="Options[${index}].FinalPrice" step="0.01" class="form-control" /></td>
+            <td>
+                <select name="Options[${index}].Available" class="form-control">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </td>
+            <td><button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class="fa fa-trash"></i></button></td>
+        </tr>`;
+    }
+
+    $(document).on("click", "#btnAddOption", function () {
+        const row = buildOptionRow(optionIndex++);
+        $("#optionBody").append(row);
+    });
+
+    $(document).on("click", ".btn-remove-row", function () {
+        $(this).closest("tr").remove();
+    });
+</script>

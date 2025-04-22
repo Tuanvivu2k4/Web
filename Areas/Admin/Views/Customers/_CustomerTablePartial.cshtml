@@ -1,0 +1,6 @@
+﻿@model IEnumerable<SaleOnline.Models.UserAccount>
+
+@foreach (var item in Model)
+{
+    @Html.Partial("_CustomerRowPartial", item)
+}

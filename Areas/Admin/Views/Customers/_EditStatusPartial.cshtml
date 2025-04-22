@@ -1,0 +1,24 @@
+﻿@model SaleOnline.Models.EditCustomerStatusViewModel
+
+
+@using (Html.BeginForm("EditStatus", "Customers", FormMethod.Post, new { id = "editStatusForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="form-group mb-3">
+        <label>Trạng thái tài khoản</label>
+        @Html.DropDownListFor(m => m.AccountStatus, new SelectList(new[]
+        {
+            new { Text = "Active", Value = "Active" },
+            new { Text = "Locked", Value = "Locked" },
+            new { Text = "Deleted", Value = "Deleted" }
+        }, "Value", "Text", Model.AccountStatus), "-- Chọn trạng thái --", new { @class = "form-control" })
+
+        @Html.ValidationMessageFor(m => m.AccountStatus, null, new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+
+}

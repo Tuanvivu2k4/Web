@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - SaleOnline</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        body {
+            background-color: #f53d2d;
+        }
+
+        .auth-box {
+            background-color: white;
+            border-radius: 5px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .logo {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center mt-5">
+        <div class="logo mb-3">
+            <a href="@Url.Action("Index", "Home")">
+                <img src="~/Content/Logo.jpg" style="width: 120px;" />
+            </a>
+        </div>
+        @RenderBody()
+    </div>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,85 @@
+﻿@model SaleOnline.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="d-flex justify-content-center">
+        <div id="alertSuccess" class="alert alert-success alert-dismissible fade show text-center px-4 py-2"
+             role="alert"
+             style="max-width: 400px; width: 100%; border-radius: 8px;">
+            @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+}
+
+<div class="auth-box">
+    <h4 class="text-center">Đăng nhập</h4>
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "mt-4" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            @Html.LabelFor(m => m.Email, htmlAttributes: new { @class = "form-label text-start d-block" })
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.Password, htmlAttributes: new { @class = "form-label text-start d-block" })
+
+            <div class="input-group mb-3">
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", id = "password" })
+
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password', this)">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+        </div>
+
+        <button type="submit" class="btn btn-danger w-100 mt-2">Đăng nhập</button>
+    }
+
+    <div class="text-center mt-3">
+        <p>Bạn chưa có tài khoản? <a href="@Url.Action("Register", "Account")" class="text-danger">Đăng ký</a></p>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function togglePassword(fieldId, iconElement) {
+            const input = document.getElementById(fieldId);
+            const icon = iconElement.querySelector("i");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+        setTimeout(function () {
+            var alertEl = document.getElementById("alertSuccess");
+            if (alertEl) {
+                var alert = $('#alertSuccess').alert('close'); // Nếu dùng Bootstrap 5
+                alert.close();
+            }
+        }, 3000); // 3000 ms = 3 giây
+    </script>
+}

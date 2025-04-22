@@ -1,0 +1,24 @@
+﻿@model SaleOnline.Models.Category
+
+<tr>
+    <td>
+        <input type="checkbox" class="checkItem" data-id="@Model.Id" />
+    </td>
+    <td>@Model.Id</td>
+    <td>
+        <img src="@Url.Content(Model.Image)" style="width: 30px; height: 30px;" />
+    </td>
+    <td>@Model.Name</td>
+    <td>@(Model.Available == "true" ? "Yes" : "No")</td>
+    <td>
+        <a href="javascript:void(0);"
+           class="text-primary me-2 btn-edit-category"
+           data-id="@Model.Id"
+           title="Sửa">
+            <i class="fa fa-edit"></i>
+        </a>
+        <button class="btn btn-danger btn-sm delete-category" data-id="@Model.Id">
+            <i class="fa fa-trash"></i>
+        </button>
+    </td>
+</tr>

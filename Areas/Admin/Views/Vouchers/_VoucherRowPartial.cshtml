@@ -1,0 +1,21 @@
+﻿@model SaleOnline.Models.Voucher
+
+<tr>
+    <td>
+        <input type="checkbox" class="checkItem" data-id="@Model.Id" />
+    </td>
+    <td>@Model.Code</td>
+    <td>@Model.Discount</td>
+    <td>@Model.Quantity</td>
+    <td>@Model.StartDate</td>
+    <td>@Model.EndDate</td>
+    <td>@Model.Available</td>
+    <td>
+        <a href="javascript:void(0);" class="text-primary me-2 btn-edit-voucher" data-id="@Model.Id" title="Sửa">
+            <i class="fa fa-edit"></i>
+        </a>
+        <button class="btn btn-sm btn-danger btn-delete-voucher" data-id="@Model.Id" title="Xoá">
+            <i class="fa fa-trash"></i>
+        </button>
+    </td>
+</tr>

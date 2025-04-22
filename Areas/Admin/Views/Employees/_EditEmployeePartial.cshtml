@@ -1,0 +1,29 @@
+﻿@model SaleOnline.Models.EditAdminViewModel
+
+@using (Html.BeginForm("Edit", "Employees", FormMethod.Post, new { enctype = "multipart/form-data", @id = "editEmployeeForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Account)
+        @Html.TextBoxFor(m => m.Account, new { @class = "form-control", id = "Account" })
+        @Html.ValidationMessageFor(m => m.Account, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Name)
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", id = "Name" })
+        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Role)
+        @Html.DropDownListFor(m => m.Role, new SelectList(new[] { "Admin", "Employee" }), "Select Role", new { @class = "form-select", id = "Role" })
+        @Html.ValidationMessageFor(m => m.Role, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+    <button type="submit" class="btn btn-primary" id="btnSubmitEdit">Lưu</button>
+}
+

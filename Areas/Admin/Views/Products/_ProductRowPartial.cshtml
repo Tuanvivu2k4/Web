@@ -1,0 +1,42 @@
+﻿@model SaleOnline.Models.Product
+
+<tr>
+    <td><input type="checkbox" class="checkItem" data-id="@Model.Id" /></td>
+
+    <td>
+        <img src="@Url.Content(Model.Image)" alt="Ảnh sản phẩm" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;" />
+    </td>
+
+    <td>@Model.Name</td>
+
+    <td>@Model.ProductionDate.ToString("dd/MM/yyyy")</td>
+
+    <td>@Model.Description</td>
+
+    <td>@Model.QuantitySold</td>
+
+    <td>@((Model.Category as SaleOnline.Models.Category)?.Name)</td>
+
+    <td>
+        @if (Model.Available == "Active")
+        {
+            <span class="badge bg-success">Active</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">Inactive</span>
+        }
+    </td>
+
+    <td>
+        <a href="javascript:void(0);" class="text-info me-2 btn-view-product" data-id="@Model.Id" title="Xem chi tiết">
+            <i class="fa fa-eye"></i>
+        </a>
+        <a href="javascript:void(0);" class="text-primary me-2 btn-edit-product" data-id="@Model.Id" title="Sửa">
+            <i class="fa fa-edit"></i>
+        </a>
+        <button class="btn btn-sm btn-danger btn-delete-product" data-id="@Model.Id" title="Xoá">
+            <i class="fa fa-trash"></i>
+        </button>
+    </td>
+</tr>
