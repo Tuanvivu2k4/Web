@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using PagedList;
+using PagedList.Mvc;
 
 namespace SaleOnline.Controllers
 {
@@ -11,16 +13,18 @@ namespace SaleOnline.Controllers
     {
         private SaleOnlineEntities db = new SaleOnlineEntities();
 
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
+            int pageSize = 30;
+            int pageNumber = page ?? 1;
+
             var categories = db.Categories
                 .Where(c => c.Available.ToLower() == "active")
                 .ToList();
 
-            var products = db.Products
+            var allProducts = db.Products
                 .Where(p => p.Available.ToLower() == "active")
                 .OrderByDescending(p => p.QuantitySold)
-                .Take(12)
                 .Select(p => new
                 {
                     p.Id,
@@ -42,12 +46,12 @@ namespace SaleOnline.Controllers
                     MinPrice = p.Options.Min(o => o.FinalPrice),
                     MaxPrice = p.Options.Max(o => o.FinalPrice)
                 })
-                .ToList();
+                .ToPagedList(pageNumber, pageSize);
 
             var viewModel = new HomePageViewModel
             {
                 Categories = categories,
-                Products = products
+                Products = allProducts
             };
 
             return View(viewModel);
