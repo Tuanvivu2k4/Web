@@ -9,6 +9,6 @@ namespace SaleOnline.Models
     public class HomePageViewModel
     {
         public List<Category> Categories { get; set; }
-        public IPagedList<ProductViewModel> Products { get; set; }
+        public IPagedList<ProductCardViewModel> Products { get; set; }
     }
 }

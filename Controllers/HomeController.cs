@@ -37,7 +37,7 @@ namespace SaleOnline.Controllers
                                     .Where(o => o.Available.ToLower() == "active"))
                 })
                 .ToList()
-                .Select(p => new ProductViewModel
+                .Select(p => new ProductCardViewModel
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -55,6 +55,102 @@ namespace SaleOnline.Controllers
             };
 
             return View(viewModel);
+        }
+
+        public ActionResult BrowseCategories()
+        {
+            var categories = db.Categories
+                .Where(c => c.Available == "Active")
+                .ToList();
+
+            return PartialView("_CategoryGrid", categories);
+        }
+
+        public ActionResult TopSellingProducts()
+        {
+            var products = db.Products
+                .Where(p => p.Available == "Active")
+                .OrderByDescending(p => p.QuantitySold)
+                .Take(10)
+                .Select(p => new ProductCardViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Image = p.Image,
+                    QuantitySold = p.QuantitySold,
+                    MinPrice = db.Variations
+                                .Where(v => v.ProductId == p.Id && v.Available == "Active")
+                                .SelectMany(v => v.VariationOptions)
+                                .Where(vo => vo.Available == "Active")
+                                .Min(vo => (decimal?)vo.FinalPrice) ?? 0,
+                    MaxPrice = db.Variations
+                                .Where(v => v.ProductId == p.Id && v.Available == "Active")
+                                .SelectMany(v => v.VariationOptions)
+                                .Where(vo => vo.Available == "Active")
+                                .Max(vo => (decimal?)vo.FinalPrice) ?? 0
+                })
+                .ToList();
+
+            ViewBag.IdPrefix = "top-selling";
+            return PartialView("_ProductSlider", products);
+        }
+
+        public ActionResult NewArrivals()
+        {
+            var products = db.Products
+                .Where(p => p.Available == "Active")
+                .OrderByDescending(p => p.ProductionDate)
+                .Take(10)
+                .Select(p => new ProductCardViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Image = p.Image,
+                    QuantitySold = p.QuantitySold,
+                    MinPrice = db.Variations
+                                .Where(v => v.ProductId == p.Id && v.Available == "Active")
+                                .SelectMany(v => v.VariationOptions)
+                                .Where(vo => vo.Available == "Active")
+                                .Min(vo => (decimal?)vo.FinalPrice) ?? 0,
+                    MaxPrice = db.Variations
+                                .Where(v => v.ProductId == p.Id && v.Available == "Active")
+                                .SelectMany(v => v.VariationOptions)
+                                .Where(vo => vo.Available == "Active")
+                                .Max(vo => (decimal?)vo.FinalPrice) ?? 0
+                })
+                .ToList();
+
+            ViewBag.IdPrefix = "new-arrivals";
+            return PartialView("_ProductSlider", products);
+        }
+
+        public ActionResult LoadProducts(int page = 1, int pageSize = 16)
+        {
+            var products = db.Products
+                .Where(p => p.Available == "Active")
+                .OrderByDescending(p => p.ProductionDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new ProductCardViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Image = p.Image,
+                    QuantitySold = p.QuantitySold,
+                    MinPrice = db.Variations
+                                .Where(v => v.ProductId == p.Id && v.Available == "Active")
+                                .SelectMany(v => v.VariationOptions)
+                                .Where(vo => vo.Available == "Active")
+                                .Min(vo => (decimal?)vo.FinalPrice) ?? 0,
+                    MaxPrice = db.Variations
+                                .Where(v => v.ProductId == p.Id && v.Available == "Active")
+                                .SelectMany(v => v.VariationOptions)
+                                .Where(vo => vo.Available == "Active")
+                                .Max(vo => (decimal?)vo.FinalPrice) ?? 0
+                })
+                .ToList();
+
+            return PartialView("_ProductGridPartial", products);
         }
     }
 }

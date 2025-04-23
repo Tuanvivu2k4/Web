@@ -5,6 +5,9 @@ namespace SaleOnline.Models
 {
     public class RegisterViewModel
     {
+        [Required(ErrorMessage = "Vui lòng nhập tên")]
+        public string Name { get; set; }
+
         [Required(ErrorMessage = "Vui lòng nhập email")]
         [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; }
@@ -14,12 +17,9 @@ namespace SaleOnline.Models
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu")]
+        [Compare("Password", ErrorMessage = "Mật khẩu không khớp")]
         [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
         public string ConfirmPassword { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập tên")]
-        public string Name { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn ngày sinh")]
         [DataType(DataType.Date)]

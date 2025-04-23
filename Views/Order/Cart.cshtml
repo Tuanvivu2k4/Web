@@ -1,0 +1,163 @@
+﻿@model List<SaleOnline.Models.CartItemViewModel>
+@{
+    ViewBag.Title = "Giỏ hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Giỏ hàng của bạn</h3>
+<form id="cart-form">
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all" /></th>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Tổng</th>
+                <th>Thao tác</th> <!-- Thêm cột -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><input type="checkbox" class="item-check" data-price="@item.TotalPrice" /></td>
+                    <td><img src="@Url.Content(item.ImageUrl)" style="width: 60px;" /></td>
+                    <td>@item.ProductName (@item.VariationOptionName)</td>
+                    <td>@item.FinalPrice.ToString("N0") đ</td>
+                    <td>
+                        <input type="number"
+                               class="form-control form-control-sm quantity-input"
+                               value="@item.Quantity"
+                               min="1"
+                               max="@item.Stock"
+                               data-id="@item.CartItemId"
+                               data-price="@item.FinalPrice"
+                               style="width: 80px;" />
+                    </td>
+                    <td class="line-total">@item.TotalPrice.ToString("N0") đ</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger btn-delete-item" data-id="@item.CartItemId">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2">
+        <div class="d-flex gap-2">
+            <button type="button" id="btn-delete-selected" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Xoá sản phẩm đã chọn
+            </button>
+            <button type="submit" class="btn btn-primary">Thanh toán</button>
+        </div>
+        <div class="fw-bold fs-5">Tổng tiền: <span id="total-amount">0</span> đ</div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        function updateLineTotal(input) {
+            const price = parseFloat(input.data('price'));
+            const quantity = parseInt(input.val());
+            const lineTotal = price * quantity;
+            input.closest('tr').find('.line-total').text(lineTotal.toLocaleString() + ' đ');
+        }
+
+        function updateTotal() {
+            let total = 0;
+            $('.item-check:checked').each(function () {
+                const row = $(this).closest('tr');
+                const quantity = parseInt(row.find('.quantity-input').val()) || 0;
+                const price = parseFloat(row.find('.quantity-input').data('price'));
+                total += price * quantity;
+            });
+            $('#total-amount').text(total.toLocaleString());
+        }
+
+        $(document).on('change', '.item-check', function () {
+            const allChecked = $('.item-check').length === $('.item-check:checked').length;
+            $('#select-all').prop('checked', allChecked);
+            updateTotal();
+        });
+
+        $(document).on('change', '#select-all', function () {
+            $('.item-check').prop('checked', $(this).is(':checked'));
+            updateTotal();
+        });
+
+        // AJAX xoá sản phẩm
+        $('.btn-delete-item').on('click', function () {
+            const id = $(this).data('id');
+            if (!confirm("Bạn có chắc muốn xoá sản phẩm này khỏi giỏ hàng?")) return;
+
+            $.ajax({
+                url: '@Url.Action("DeleteCartItem", "Order")',
+                type: 'POST',
+                data: { id: id },
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert("Lỗi: " + result.message);
+                    }
+                }
+            });
+        });
+        $('#btn-delete-selected').on('click', function () {
+            const selectedIds = $('.item-check:checked').map(function () {
+                return $(this).closest('tr').find('.btn-delete-item').data('id');
+            }).get();
+
+            if (selectedIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một sản phẩm để xoá.");
+                return;
+            }
+
+            if (!confirm("Bạn có chắc muốn xoá các sản phẩm đã chọn khỏi giỏ hàng?")) return;
+
+            $.ajax({
+                url: '@Url.Action("DeleteMultipleCartItems", "Order")',
+                type: 'POST',
+                traditional: true,
+                data: { ids: selectedIds },
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert("Lỗi: " + result.message);
+                    }
+                }
+            });
+        });
+        $(document).on('input', '.quantity-input', function () {
+            const input = $(this);
+            const max = parseInt(input.attr('max'));
+            let val = parseInt(input.val());
+
+            if (val > max) val = max;
+            if (val < 1 || isNaN(val)) val = 1;
+
+            input.val(val);
+            updateLineTotal(input);
+            updateTotal();
+        });
+
+        // Gửi cập nhật về DB khi blur
+        $(document).on('blur', '.quantity-input', function () {
+            const input = $(this);
+            const id = input.data('id');
+            const quantity = parseInt(input.val());
+
+            $.ajax({
+                url: '@Url.Action("UpdateCartItemQuantity", "Order")',
+                type: 'POST',
+                data: { id: id, quantity: quantity }
+            });
+        });
+        updateTotal();
+    </script>
+}

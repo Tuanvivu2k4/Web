@@ -9,7 +9,7 @@
         <img src="@Url.Content(Model.Image)" style="width: 30px; height: 30px;" />
     </td>
     <td>@Model.Name</td>
-    <td>@(Model.Available == "true" ? "Yes" : "No")</td>
+    <td>@(Model.Available == "Active" ? "Active" : "Inactive")</td>
     <td>
         <a href="javascript:void(0);"
            class="text-primary me-2 btn-edit-category"

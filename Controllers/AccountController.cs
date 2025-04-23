@@ -12,10 +12,13 @@ namespace SaleOnline.Controllers
     {
         private SaleOnlineEntities db = new SaleOnlineEntities();
         // GET: Account
+        [HttpGet]
         public ActionResult Register()
         {
-            if (Session["UserId"] != null)
+            if (Session["User"] != null)
+            {
                 return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
@@ -23,64 +26,63 @@ namespace SaleOnline.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Register(RegisterViewModel model)
         {
-            if (Session["UserId"] != null)
-                return RedirectToAction("Index", "Home");
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var existingUser = db.UserAccounts.FirstOrDefault(u => u.Email == model.Email);
+            if (existingUser != null)
             {
-                if (db.UserAccounts.Any(u => u.Email == model.Email))
-                {
-                    ModelState.AddModelError("Email", "Email đã được đăng ký");
-                    return View(model);
-                }
-
-                var user = new UserAccount
-                {
-                    Email = model.Email,
-                    Password = PasswordHelper.HashPassword(model.Password),
-                    Name = model.Name,
-                    DateOfBirth = model.DateOfBirth,
-                    AccountStatus = "Active"
-                };
-
-                db.UserAccounts.Add(user);
-                db.SaveChanges();
-                TempData["SuccessMessage"] = "Đăng ký thành công!";
-                return RedirectToAction("Login", "Account");
+                // Gán lỗi cho đúng trường Email
+                ModelState.AddModelError("Email", "Email đã được sử dụng");
+                return View(model);
             }
 
-            return View(model);
+            var user = new UserAccount
+            {
+                Name = model.Name,
+                Email = model.Email,
+                Password = PasswordHelper.HashPassword(model.Password),
+                DateOfBirth = model.DateOfBirth,
+                AccountStatus = "Active"
+            };
+
+            db.UserAccounts.Add(user);
+            db.SaveChanges();
+
+            TempData["RegisterSuccess"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+            return RedirectToAction("Login");
         }
 
         [HttpGet]
         public ActionResult Login()
         {
-            if (Session["UserId"] != null)
+            if (Session["User"] != null)
+            {
                 return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Login(LoginViewModel model)
         {
-            if (Session["UserId"] != null)
-                return RedirectToAction("Index", "Home");
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            var user = db.UserAccounts.FirstOrDefault(u => u.Email == model.Email);
+            if (user == null || !PasswordHelper.VerifyPassword(model.Password, user.Password))
             {
-                var user = db.UserAccounts.FirstOrDefault(u => u.Email == model.Email);
-
-                if (user == null || !PasswordHelper.VerifyPassword(model.Password, user.Password))
-                {
-                    ModelState.AddModelError("", "Email hoặc mật khẩu không đúng");
-                    return View(model);
-                }
-
-                Session["UserId"] = user.Id;
-                Session["UserName"] = user.Name;
-                return RedirectToAction("Index", "Home");
+                ModelState.AddModelError("", "Email hoặc mật khẩu không đúng.");
+                return View(model);
             }
 
-            return View(model);
+            Session["User"] = user;
+            return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult Logout()
+        {
+            Session.Remove("User");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

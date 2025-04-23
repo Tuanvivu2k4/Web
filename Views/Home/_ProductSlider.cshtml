@@ -1,0 +1,53 @@
+﻿@model List<SaleOnline.Models.ProductCardViewModel>
+@{
+    string idPrefix = ViewBag.IdPrefix ?? "swiper-default";
+}
+
+<div class="position-relative overflow-hidden my-4">
+    <div class="swiper-container @($"{idPrefix}-container")">
+        <div class="swiper-wrapper">
+            @foreach (var p in Model)
+            {
+                <div class="swiper-slide" style="width: 200px;">
+                    <a href="@Url.Action("Detail", "Product", new { id = p.Id })" class="text-decoration-none text-dark">
+                        <div class="card h-100 border-0">
+                            <img src="@Url.Content(p.Image)" class="card-img-top" style="object-fit: cover; height: 160px;" />
+                            <div class="card-body px-2 pb-2">
+                                <h6 class="card-title fw-bold">@p.Name</h6>
+                                <p class="text-danger mb-1">
+                                    @(p.MinPrice == p.MaxPrice ? $"{p.MinPrice:N0} đ" : $"{p.MinPrice:N0} đ - {p.MaxPrice:N0} đ")
+                                </p>
+                                <div class="text-end">
+                                    <small class="text-muted"><i class="fas fa-fire"></i> @p.QuantitySold bán</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <!-- Mũi tên riêng -->
+        <div class="swiper-button-prev @($"{idPrefix}-prev")"></div>
+        <div class="swiper-button-next @($"{idPrefix}-next")"></div>
+    </div>
+</div>
+
+<script>
+    var swiperInstance = new Swiper('.@($"{idPrefix}-container")', {
+        slidesPerView: 2,
+        spaceBetween: 16,
+        breakpoints: {
+            576: { slidesPerView: 3 },
+            768: { slidesPerView: 4 },
+            992: { slidesPerView: 5 },
+            1200: { slidesPerView: 6 }
+        },
+        navigation: {
+            nextEl: '.@($"{idPrefix}-next")',
+            prevEl: '.@($"{idPrefix}-prev")'
+        },
+        watchOverflow: true,
+        grabCursor: true
+    });
+</script>
