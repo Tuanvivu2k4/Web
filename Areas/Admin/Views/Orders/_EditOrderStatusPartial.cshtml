@@ -1,0 +1,22 @@
+﻿@model SaleOnline.Models.UpdateOrderStatusViewModel
+
+@using (Html.BeginForm("UpdateStatus", "Orders", FormMethod.Post, new { id = "editOrderStatusForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Status)
+        @Html.DropDownListFor(m => m.Status, new SelectList(new[]
+        {
+            "Chờ xác nhận", "Đang chuẩn bị hàng", "Đang trên đường giao", "Đã giao hàng", "Huỷ đơn hàng"
+        }), "-- Chọn trạng thái --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+    </div>
+}
+

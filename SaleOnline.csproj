@@ -232,6 +232,7 @@
     <Compile Include="Areas\Admin\Controllers\CustomersController.cs" />
     <Compile Include="Areas\Admin\Controllers\DashboardController.cs" />
     <Compile Include="Areas\Admin\Controllers\EmployeesController.cs" />
+    <Compile Include="Areas\Admin\Controllers\OrdersController.cs" />
     <Compile Include="Areas\Admin\Controllers\ProductsController.cs" />
     <Compile Include="Areas\Admin\Controllers\VouchersController.cs" />
     <Compile Include="Areas\Admin\DTO\DashboardDTO.cs" />
@@ -272,9 +273,12 @@
     <Compile Include="Models\Order.cs">
       <DependentUpon>SaleOnline.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\OrderDetailViewModel.cs" />
     <Compile Include="Models\OrderItem.cs">
       <DependentUpon>SaleOnline.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\OrderListViewModel.cs" />
+    <Compile Include="Models\OrderPrintViewModel.cs" />
     <Compile Include="Models\Product.cs">
       <DependentUpon>SaleOnline.tt</DependentUpon>
     </Compile>
@@ -298,6 +302,8 @@
     <Compile Include="Models\sysdiagram.cs">
       <DependentUpon>SaleOnline.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\UpdateMultipleOrdersStatusViewModel.cs" />
+    <Compile Include="Models\UpdateOrderStatusViewModel.cs" />
     <Compile Include="Models\UserAccount.cs">
       <DependentUpon>SaleOnline.tt</DependentUpon>
     </Compile>
@@ -394,6 +400,15 @@
     <Content Include="Areas\Admin\Views\Products\_AddProductPartial.cshtml" />
     <Content Include="Areas\Admin\Views\Products\_ProductDetailPartial.cshtml" />
     <Content Include="Areas\Admin\Views\Products\_EditProductPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
+    <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\_OrderRowPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\_OrderTablePartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\_OrderDetailPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\_EditOrderStatusPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\_EditMultipleOrderStatusPartial.cshtml" />
+    <Content Include="Areas\Admin\Views\Orders\PrintOrder.cshtml" />
     <None Include="Scripts\jquery-3.6.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery-3.6.0.min.js" />
@@ -429,7 +444,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Admin\Views\Orders\" />
     <Folder Include="Areas\Employee\Controllers\" />
     <Folder Include="Areas\Employee\Data\" />
     <Folder Include="Areas\Employee\Views\Shared\" />

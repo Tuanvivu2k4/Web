@@ -1,0 +1,38 @@
+﻿@model SaleOnline.Models.OrderDetailViewModel
+
+<div class="p-3">
+    <h5>Thông tin đơn hàng</h5>
+    <p><strong>Khách hàng:</strong> @Model.CustomerName</p>
+    <p><strong>Số điện thoại:</strong> @Model.PhoneNumber</p>
+    <p><strong>Địa chỉ:</strong> @Model.Address</p>
+    <p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+    <p><strong>Thanh toán:</strong> @(Model.PaymentMethod == "COD" ? "Thanh toán khi nhận hàng" : "Đã thanh toán")</p>
+    <p><strong>Mã giảm giá:</strong> @Model.VoucherCode ?? "-" </p>
+    <p><strong>Giảm:</strong> @Model.Discount.ToString("N0") ₫</p>
+    <p><strong>Tổng tiền:</strong> @Model.FinalPrice.ToString("N0") ₫</p>
+    <p><strong>Trạng thái:</strong> @Model.Status</p>
+
+    <hr />
+    <h6>Chi tiết sản phẩm:</h6>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Tùy chọn</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.VariationOptionValue</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.PriceItem.ToString("N0") ₫</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

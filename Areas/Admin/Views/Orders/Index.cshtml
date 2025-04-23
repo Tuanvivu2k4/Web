@@ -1,0 +1,240 @@
+﻿@model PagedList.IPagedList<SaleOnline.Models.OrderListViewModel>
+@using PagedList.Mvc
+@using SaleOnline.Models
+
+@{
+    ViewBag.Title = "Quản lý đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Bộ lọc tìm kiếm -->
+<div class="row mb-3">
+    <div class="col-md-10 mx-auto d-flex justify-content-center gap-2">
+        <input type="text" class="form-control" id="searchId" placeholder="Tìm theo ID" value="@ViewBag.CurrentSearchId" style="max-width: 150px;" />
+
+        <select class="form-control" id="paymentFilter" style="max-width: 200px;">
+            <option value="">-- Phương thức thanh toán --</option>
+            <option value="COD" @(ViewBag.CurrentPayment == "COD" ? "selected" : "")>Thanh toán khi nhận hàng</option>
+            <option value="Paid" @(ViewBag.CurrentPayment == "Paid" ? "selected" : "")>Đã thanh toán</option>
+        </select>
+
+        <select class="form-control" id="statusFilter" style="max-width: 200px;">
+            <option value="">-- Trạng thái đơn hàng --</option>
+            <option value="Chờ xác nhận" @(ViewBag.CurrentStatus == "Chờ xác nhận" ? "selected" : "")>Chờ xác nhận</option>
+            <option value="Đang chuẩn bị hàng" @(ViewBag.CurrentStatus == "Đang chuẩn bị hàng" ? "selected" : "")>Đang chuẩn bị hàng</option>
+            <option value="Đang trên đường giao" @(ViewBag.CurrentStatus == "Đang trên đường giao" ? "selected" : "")>Đang trên đường giao</option>
+            <option value="Đã giao hàng" @(ViewBag.CurrentStatus == "Đã giao hàng" ? "selected" : "")>Đã giao hàng</option>
+            <option value="Huỷ đơn hàng" @(ViewBag.CurrentStatus == "Huỷ đơn hàng" ? "selected" : "")>Huỷ đơn hàng</option>
+        </select>
+
+        <button class="btn btn-primary" id="btnSearch"><i class="fa fa-search"></i> Tìm</button>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fa fa-download"></i> Export
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="@Url.Action("Export", "Orders", new { area = "Admin", format = "xlsx" })">Export to Excel (.xlsx)</a></li>
+            <li><a class="dropdown-item" href="@Url.Action("Export", "Orders", new { area = "Admin", format = "csv" })">Export to CSV (.csv)</a></li>
+            <li><a class="dropdown-item" href="@Url.Action("Export", "Orders", new { area = "Admin", format = "txt" })">Export to Text (.txt)</a></li>
+        </ul>
+    </div>
+    <button type="button" class="btn btn-warning" id="btnEditMultipleOrderStatus">
+        <i class="fa fa-edit"></i> Cập nhật trạng thái
+    </button>
+</div>
+
+<!-- Bảng dữ liệu -->
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="checkAll" /></th>
+            <th>ID</th>
+            <th>Khách hàng</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Ngày đặt</th>
+            <th>Thanh toán</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody id="orderTableContainer">
+        @Html.Partial("_OrderTablePartial", Model)
+    </tbody>
+</table>
+
+<!-- Phân trang -->
+<div class="d-flex justify-content-center">
+    @Html.PagedListPager(Model, page => Url.Action("Index", new
+    {
+        page,
+        searchId = ViewBag.CurrentSearchId,
+        payment = ViewBag.CurrentPayment,
+        status = ViewBag.CurrentStatus
+    }), new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        MaximumPageNumbersToDisplay = 5,
+        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+        UlElementClasses = new[] { "pagination", "justify-content-center" }
+    })
+</div>
+
+<div class="modal fade" id="viewOrderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailContent">
+                <!-- Ajax load content here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editOrderStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật trạng thái đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="editOrderStatusModalBody">
+                <!-- Nội dung được load ở JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editMultipleOrderStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật trạng thái đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="editMultipleOrderStatusModalBody">
+                <!-- Ajax load -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#btnSearch').click(function () {
+                const id = $('#searchId').val();
+                const payment = $('#paymentFilter').val();
+                const status = $('#statusFilter').val();
+                const query = `?id=${id}&paymentMethod=${payment}&status=${status}`;
+                window.location.href = '@Url.Action("Index", "Orders", new { area = "Admin" })' + query;
+            });
+            // Khi tích checkbox dòng
+            $(document).on('change', '.checkItem', function () {
+                const allChecked = $('.checkItem').length === $('.checkItem:checked').length;
+                $('#checkAll').prop('checked', allChecked);
+            });
+
+            // Khi tích/bỏ checkbox "Chọn tất cả"
+            $(document).on('change', '#checkAll', function () {
+                $('.checkItem').prop('checked', $(this).is(':checked'));
+            });
+            $(document).on("click", ".btn-view-order", function () {
+                const id = $(this).data("id");
+                $.get('@Url.Action("DetailPartial", "Orders")', { id: id }, function (html) {
+                    $("#orderDetailContent").html(html);
+                    $("#viewOrderModal").modal("show");
+                });
+            });
+            $(document).on("click", ".btn-edit-order-status", function () {
+                const id = $(this).data("id");
+                $.get('@Url.Action("EditStatus", "Orders")', { id: id }, function (html) {
+                    $('#editOrderStatusModalBody').html(html);
+                    $('#editOrderStatusModal').modal('show');
+                });
+            });
+
+            $(document).on('submit', '#editOrderStatusForm', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const formData = form.serialize();
+
+                $.ajax({
+                    url: form.attr("action"),
+                    type: "POST",
+                    data: formData,
+                    success: function () {
+                        $('#editOrderStatusModal').modal('hide');
+                        $.get('@Url.Action("GetOrderTable", "Orders")', function (html) {
+                            $('#orderTableContainer').html(html);
+                            $('#checkAll').prop('checked', false);
+                        });
+                        alert("Cập nhật trạng thái thành công.");
+                    },
+                    error: function (xhr) {
+                        $('#editOrderStatusModalBody').html(xhr.responseText);
+                    }
+                });
+            });
+            $(document).on("click", "#btnEditMultipleOrderStatus", function () {
+                const ids = [];
+                $(".checkItem:checked").each(function () {
+                    ids.push($(this).data("id"));
+                });
+
+                if (ids.length === 0) {
+                    alert("Bạn chưa chọn đơn hàng nào.");
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("EditMultipleStatus", "Orders")',
+                    type: "GET",
+                    traditional: true,
+                    data: { ids: ids },
+                    success: function (html) {
+                        $("#editMultipleOrderStatusModalBody").html(html);
+                        $("#editMultipleOrderStatusModal").modal("show");
+                    },
+                    error: function () {
+                        alert("Không thể tải form cập nhật trạng thái.");
+                    }
+                });
+            });
+
+            $(document).on("submit", "#editMultipleOrderStatusForm", function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const data = form.serialize();
+
+                $.ajax({
+                    url: form.attr("action"),
+                    type: "POST",
+                    data: data,
+                    success: function () {
+                        $("#editMultipleOrderStatusModal").modal("hide");
+                        $.get('@Url.Action("GetOrderTable", "Orders")', function (html) {
+                            $("#orderTableContainer").html(html);
+                            $("#checkAll").prop("checked", false);
+                        });
+                        alert("Cập nhật trạng thái thành công.");
+                    },
+                    error: function (xhr) {
+                        $("#editMultipleOrderStatusModalBody").html(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+}

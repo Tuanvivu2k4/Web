@@ -1,0 +1,35 @@
+﻿@model SaleOnline.Models.OrderListViewModel
+
+<tr>
+    <td>
+        <input type="checkbox" class="checkItem" data-id="@Model.Id" />
+    </td>
+    <td>@Model.Id</td>
+    <td>@Model.CustomerName</td>
+    <td>@Model.PhoneNumber</td>
+    <td>@Model.Address</td>
+    <td>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+    <td>
+        @if (Model.PaymentMethod == "COD")
+        {
+            <span class="badge bg-warning text-dark">COD</span>
+        }
+        else
+        {
+            <span class="badge bg-success">Đã thanh toán</span>
+        }
+    </td>
+    <td>@Model.FinalPrice.ToString("N0") ₫</td>
+    <td>
+        <span class="badge bg-info text-dark">@Model.Status</span>
+    </td>
+    <td>
+        <a href="javascript:void(0);" class="text-primary me-2 btn-edit-order-status" data-id="@Model.Id" title="Sửa trạng thái">
+            <i class="fa fa-edit"></i>
+        </a>
+        <a href="javascript:void(0);" class="text-primary btn-view-order" data-id="@Model.Id"><i class="fa fa-eye"></i></a>
+        <a href="@Url.Action("Print", "Orders", new { area = "Admin", id = Model.Id })" class="text-secondary" title="In đơn hàng" target="_blank">
+            <i class="fa fa-print"></i>
+        </a>
+    </td>
+</tr>

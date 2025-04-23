@@ -58,8 +58,8 @@
 
     <hr />
     <h5>Tùy chọn</h5>
-    <table class="table table-bordered">
-        <thead>
+    <table class="table table-bordered align-middle">
+        <thead class="table-light">
             <tr>
                 <th>Giá trị</th>
                 <th>Ảnh</th>
@@ -69,36 +69,68 @@
                 <th>Giảm (%)</th>
                 <th>Giá sau giảm</th>
                 <th>Trạng thái</th>
+                <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="optionTableBody">
             @for (int i = 0; i < Model.Options.Count; i++)
             {
-                <tr>
+                <tr class="option-row" data-index="@i">
                     @Html.HiddenFor(m => m.Options[i].Id)
-                    <td>@Html.TextBoxFor(m => m.Options[i].Value, new { @class = "form-control" })</td>
+
+                    <td>
+                        @Html.TextBoxFor(m => m.Options[i].Value, new { @class = "form-control" })
+                    </td>
+
                     <td>
                         <input type="file" name="Options[@i].ImageFile" class="form-control" />
                         @if (!string.IsNullOrEmpty(Model.Options[i].Image))
                         {
-                            <img src="@Url.Content(Model.Options[i].Image)" class="mt-1" width="50" height="50" style="object-fit:cover;" />
+                            <img src="@Url.Content(Model.Options[i].Image)" class="mt-1 d-block" width="50" height="50" style="object-fit:cover;" />
                         }
                     </td>
-                    <td>@Html.TextBoxFor(m => m.Options[i].Stock, new { @class = "form-control", type = "number" })</td>
-                    <td>@Html.TextBoxFor(m => m.Options[i].OriginalPrice, new { @class = "form-control", type = "number", step = "0.01" })</td>
-                    <td><input type="number" name="Options[@i].SellingPrice" class="form-control price-input" value="@Model.Options[i].SellingPrice" step="0.01" /></td>
-                    <td><input type="number" name="Options[@i].Discount" class="form-control discount-input" value="@Model.Options[i].Discount" step="0.01" min="0" max="1" /></td>
-                    <td><input type="number" name="Options[@i].FinalPrice" class="form-control final-input" value="@Model.Options[i].FinalPrice" step="0.01" /></td>
+
+                    <td>
+                        @Html.TextBoxFor(m => m.Options[i].Stock, new { @class = "form-control", type = "number", min = "0" })
+                    </td>
+
+                    <td>
+                        @Html.TextBoxFor(m => m.Options[i].OriginalPrice, new { @class = "form-control price-input", type = "number", step = "0.01", min = "0" })
+                    </td>
+
+                    <td>
+                        <input type="number" name="Options[@i].SellingPrice" class="form-control price-input" value="@Model.Options[i].SellingPrice" step="0.01" min="0" />
+                    </td>
+
+                    <td>
+                        <input type="number" name="Options[@i].Discount" class="form-control discount-input" value="@Model.Options[i].Discount" step="0.01" min="0" max="1" />
+                    </td>
+
+                    <td>
+                        <input type="number" name="Options[@i].FinalPrice" class="form-control final-input" value="@Model.Options[i].FinalPrice" step="0.01" min="0" />
+                    </td>
+
                     <td>
                         <select name="Options[@i].Available" class="form-control">
                             <option value="Active" @(Model.Options[i].Available == "Active" ? "selected" : "")>Active</option>
                             <option value="Inactive" @(Model.Options[i].Available == "Inactive" ? "selected" : "")>Inactive</option>
                         </select>
                     </td>
+
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-danger btn-remove-option-edit" title="Xoá dòng này">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
+
+    <!-- Nút thêm dòng mới -->
+    <button type="button" class="btn btn-outline-success mt-2" id="btnAddOptionEdit">
+        <i class="fa fa-plus"></i> Thêm tuỳ chọn
+    </button>
 
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>

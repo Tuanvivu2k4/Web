@@ -34,13 +34,13 @@
                 <i class="fa fa-download"></i> Export
             </button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="@Url.Action("Export", "Vouchers", new { area = "Admin", format = "xlsx" })">Export to Excel (.xlsx)</a></li>
-                <li><a class="dropdown-item" href="@Url.Action("Export", "Vouchers", new { area = "Admin", format = "csv" })">Export to CSV (.csv)</a></li>
-                <li><a class="dropdown-item" href="@Url.Action("Export", "Vouchers", new { area = "Admin", format = "txt" })">Export to Text (.txt)</a></li>
+                <li><a class="dropdown-item" href="@Url.Action("Export", "Products", new { area = "Admin", format = "xlsx" })">Export to Excel (.xlsx)</a></li>
+                <li><a class="dropdown-item" href="@Url.Action("Export", "Products", new { area = "Admin", format = "csv" })">Export to CSV (.csv)</a></li>
+                <li><a class="dropdown-item" href="@Url.Action("Export", "Products", new { area = "Admin", format = "txt" })">Export to Text (.txt)</a></li>
             </ul>
         </div>
 
-        <form action="@Url.Action("Import", "Vouchers", new { area = "Admin" })" method="post" enctype="multipart/form-data" class="d-inline-block">
+        <form action="@Url.Action("Import", "Products", new { area = "Admin" })" method="post" enctype="multipart/form-data" class="d-inline-block">
             <div class="input-group">
                 <input type="file" name="importFile" class="form-control" accept=".xlsx,.csv,.txt" required />
                 <button type="submit" class="btn btn-success">
@@ -181,6 +181,138 @@
                 $.get('@Url.Action("DetailPartial", "Products")', { id: id }, function (html) {
                     $("#viewProductContent").html(html);
                     $("#viewProductModal").modal("show");
+                });
+            });
+            $(document).on('click', '.btn-edit-product', function () {
+                const id = $(this).data('id');
+                $.get('@Url.Action("EditPartial", "Products")', { id: id }, function (html) {
+                    $('#editProductModalBody').html(html);
+                    $('#editProductModal').modal('show');
+                });
+            });
+
+            // Gửi form sửa
+            $(document).on('submit', '#editProductForm', function (e) {
+                e.preventDefault();
+
+                const form = this;
+                const formData = new FormData(form);
+
+                $.ajax({
+                    url: form.action,
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function () {
+                        $('#editProductModal').modal('hide');
+                        $.get('@Url.Action("GetProductTable", "Products")', {
+                            search: $('#searchName').val(),
+                            categoryId: $('#categoryFilter').val(),
+                            status: $('#statusFilter').val()
+                        }, function (html) {
+                            $('#productTableContainer').html(html);
+                            $('#checkAll').prop('checked', false);
+                        });
+                        alert("Cập nhật sản phẩm thành công.");
+                    },
+                    error: function (xhr) {
+                        $('#editProductModalBody').html(xhr.responseText);
+                    }
+                });
+            });
+
+            // Thêm dòng option mới
+            $(document).on('click', '#btnAddOptionEdit', function () {
+                const index = $('#editProductForm .option-row').length;
+                const template = $('#editOptionTemplate').html().replace(/__index__/g, index);
+                $('#editOptionContainer').append(template);
+                reindexOptionRows();
+            });
+
+            // Xoá dòng option
+            $(document).on('click', '.btn-remove-option-edit', function () {
+                $(this).closest('.option-row').remove();
+                reindexOptionRows();
+            });
+            function reindexOptionRows() {
+                $('#editProductForm .option-row').each(function (index) {
+                    $(this).attr('data-index', index);
+
+                    $(this).find('input, select').each(function () {
+                        const name = $(this).attr('name');
+                        if (name) {
+                            const newName = name.replace(/\Options\[\d+\]/, 'Options[' + index + ']');
+                            $(this).attr('name', newName);
+                        }
+
+                        const id = $(this).attr('id');
+                        if (id) {
+                            const newId = id.replace(/\Options_\d+__/, 'Options_' + index + '__');
+                            $(this).attr('id', newId);
+                        }
+                    });
+                });
+            }
+            $(document).on('click', '.btn-delete-product', function () {
+                const id = $(this).data('id');
+
+                if (!confirm("Bạn có chắc muốn xoá sản phẩm này (bao gồm các biến thể và tuỳ chọn)?")) return;
+
+                $.ajax({
+                    url: '@Url.Action("DeleteProduct", "Products")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.success) {
+                            $.get('@Url.Action("GetProductTable", "Products")', {
+                                search: $('#searchName').val(),
+                                categoryId: $('#categoryFilter').val(),
+                                status: $('#statusFilter').val()
+                            }, function (html) {
+                                $('#productTableContainer').html(html);
+                                $('#checkAll').prop('checked', false);
+                            });
+                            alert("Đã xoá thành công.");
+                        }
+                    },
+                    error: function () {
+                        alert("Đã xảy ra lỗi khi xoá.");
+                    }
+                });
+            });
+            $(document).on('click', '#btnDeleteSelected', function () {
+                let ids = [];
+
+                $('.checkItem:checked').each(function () {
+                    const id = $(this).data('id');
+                    if (id) ids.push(id);
+                });
+
+                if (ids.length === 0) {
+                    alert("Bạn chưa chọn sản phẩm nào.");
+                    return;
+                }
+
+                if (!confirm("Bạn có chắc muốn xoá các sản phẩm đã chọn (bao gồm cả biến thể và tuỳ chọn)?")) return;
+
+                $.ajax({
+                    url: '@Url.Action("DeleteSelectedProducts", "Products")',
+                    type: 'POST',
+                    traditional: true,
+                    data: { ids: ids },
+                    success: function (res) {
+                        if (res.success) {
+                            $.get('@Url.Action("GetProductTable", "Products")', function (html) {
+                                $('#productTableContainer').html(html);
+                                $('#checkAll').prop('checked', false);
+                                alert("Đã xoá thành công.");
+                            });
+                        }
+                    },
+                    error: function () {
+                        alert("Đã xảy ra lỗi khi xoá.");
+                    }
                 });
             });
         });

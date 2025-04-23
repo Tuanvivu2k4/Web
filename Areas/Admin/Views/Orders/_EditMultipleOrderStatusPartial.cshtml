@@ -1,0 +1,24 @@
+﻿@model SaleOnline.Models.UpdateMultipleOrdersStatusViewModel
+
+@using (Html.BeginForm("UpdateMultipleStatus", "Orders", FormMethod.Post, new { id = "editMultipleOrderStatusForm" }))
+{
+    @Html.AntiForgeryToken()
+    @foreach (var id in Model.Ids)
+    {
+        <input type="hidden" name="Ids" value="@id" />
+    }
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Status)
+        @Html.DropDownListFor(m => m.Status, new SelectList(new[]
+        {
+            "Chờ xác nhận", "Đang chuẩn bị hàng", "Đang trên đường giao", "Đã giao hàng", "Huỷ đơn hàng"
+        }), "-- Chọn trạng thái --", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Status, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+        <button type="submit" class="btn btn-primary">Cập nhật</button>
+    </div>
+}

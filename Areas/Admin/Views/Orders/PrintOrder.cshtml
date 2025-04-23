@@ -1,0 +1,156 @@
+﻿@model SaleOnline.Models.OrderPrintViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Đơn hàng #@Model.Id</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+            font-size: 15px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h2 {
+            margin-bottom: 5px;
+        }
+        .info-section {
+            margin-bottom: 30px;
+        }
+        .info-section div {
+            margin: 4px 0;
+        }
+        .info-section .label {
+            font-weight: bold;
+            width: 200px;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid #bbb;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f8f8f8;
+        }
+        .summary {
+            text-align: right;
+            margin-bottom: 40px;
+        }
+        .summary h4 {
+            margin: 5px 0;
+        }
+        .footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer div {
+            width: 45%;
+            text-align: center;
+        }
+
+            .footer div p {
+                font-weight: bold;
+                margin-bottom: 70px;
+            }
+
+            .footer div span {
+                display: inline-block;
+                border-top: 1px solid #000;
+                width: 70%;
+                margin-top: 10px;
+            }
+
+        .info-section .label {
+            min-width: 160px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .info-section div,
+        .summary h4 {
+            line-height: 1.6;
+        }
+
+        @@media print {
+            body {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+    <div class="header">
+        <img src="~/Content/Logo.jpg" alt="Logo" style="height: 60px;" onerror="this.style.display='none'" />
+        <h2>PHIẾU GIAO HÀNG</h2>
+        <div>Mã đơn hàng: <strong>#@Model.Id</strong></div>
+    </div>
+
+    <div class="info-section">
+        <div><span class="label">Khách hàng:</span> @Model.CustomerName</div>
+        <div><span class="label">Số điện thoại:</span> @Model.PhoneNumber</div>
+        <div><span class="label">Địa chỉ giao hàng:</span> @Model.Address</div>
+        <div><span class="label">Ngày đặt:</span> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+        <div><span class="label">Phương thức thanh toán:</span> @(Model.PaymentMethod == "COD" ? "Thanh toán khi nhận hàng" : "Đã thanh toán")</div>
+        <div><span class="label">Trạng thái:</span> @Model.Status</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên sản phẩm</th>
+                <th>Tuỳ chọn</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Items.Count; i++)
+            {
+                var item = Model.Items[i];
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td>@item.ProductName</td>
+                    <td>@item.Variation</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Price.ToString("N0") ₫</td>
+                    <td>@((item.Price * item.Quantity).ToString("N0")) ₫</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <h4>Tổng tiền đơn hàng: <strong>@Model.Total.ToString("N0") ₫</strong></h4>
+        <h4>Số tiền cần thanh toán: <strong>@Model.AmountToPay.ToString("N0") ₫</strong></h4>
+    </div>
+
+    <div class="footer">
+        <div>
+            <p>Người giao hàng</p>
+            <span></span>
+        </div>
+        <div>
+            <p>Người nhận hàng</p>
+            <span></span>
+        </div>
+    </div>
+</body>
+</html>
